@@ -5,6 +5,7 @@ import os
 import string
 import random
 
+from dateutil.relativedelta import relativedelta
 from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 from wtforms import Form, StringField, TextAreaField, validators
@@ -15,21 +16,27 @@ app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "paste.db")
 db = SQLAlchemy(app)
 
+DATETIME_NEVER = datetime(year=1970, month=1, day=1)
+
 
 class Paste(db.Model):
     num = db.Column(db.Integer, primary_key=True)
     paste_id = db.Column(db.String(5), unique=True)
     paste_date = db.Column(db.DateTime)
+    paste_expire = db.Column(db.DateTime)
     paste_title = db.Column(db.Text)
     paste_text = db.Column(db.Text)
 
-    def __init__(self, paste_id, paste_title, paste_text, paste_date=None,):
+    def __init__(self, paste_id, paste_title, paste_text, paste_date=None, paste_expire=None):
         self.paste_id = paste_id
         self.paste_title = paste_title
         self.paste_text = paste_text
         if paste_date is None:
             paste_date = datetime.now()
         self.paste_date = paste_date
+        if paste_expire is None:
+            paste_expire = DATETIME_NEVER
+        self.paste_expire = paste_expire
 
     def __repr__(self):
         return "<Paste %r>" % self.paste_id
@@ -50,7 +57,7 @@ def format_time(time):
 
 @app.route("/", methods=["GET"])
 def main():
-    return render_template("index.html", date="", title="", show_new_button=False)
+    return render_template("index.html", show_new_button=False)
 
 
 @app.route("/p/")
@@ -68,11 +75,20 @@ def paste(paste_id=None):
         if this_paste is None:
             return redirect(url_for("main"))
 
-        date = format_time(this_paste.paste_date)
+        expires = this_paste.paste_expire
+        if expires != DATETIME_NEVER and datetime.now() > expires:
+            flash("This paste has expired", "warning")
+            return redirect(url_for("main"))
+        elif expires != DATETIME_NEVER:
+            expires = "Expires: %s" % format_time(expires)
+        else:
+            expires = ""
+
+        date = "Created: %s" % format_time(this_paste.paste_date)
         title = this_paste.paste_title
         text = this_paste.paste_text
 
-        return render_template("paste.html", date=date, title=title, text=text, show_new_button=True)
+        return render_template("paste.html", date=date, expires=expires, title=title, text=text, show_new_button=True)
 
 
 @app.route("/new", methods=["POST"])
@@ -83,11 +99,26 @@ def new():
         paste_title = request.form["title"]
         paste_date = datetime.now()
 
+        paste_expire = request.form["expires"].lower()
+        if paste_expire == "1 hour":
+            paste_expire = datetime.now() + relativedelta(hours=1)
+        elif paste_expire == "6 hours":
+            paste_expire = datetime.now() + relativedelta(hours=6)
+        elif paste_expire == "12 hours":
+            paste_expire = datetime.now() + relativedelta(hours=12)
+        elif paste_expire == "1 day":
+            paste_expire = datetime.now() + relativedelta(days=1)
+        elif paste_expire == "1 week":
+            paste_expire = datetime.now() + relativedelta(weeks=1)
+        else:
+            paste_expire = DATETIME_NEVER
+
         paste_id = get_id()
         while len(Paste.query.filter_by(paste_id=paste_id).all()) != 0:
             paste_id = get_id()
 
-        new_paste = Paste(paste_id=paste_id, paste_title=paste_title, paste_text=paste_text, paste_date=paste_date)
+        new_paste = Paste(paste_id=paste_id, paste_title=paste_title, paste_text=paste_text, paste_date=paste_date,
+                          paste_expire=paste_expire)
         db.session.add(new_paste)
         db.session.commit()
 
@@ -98,6 +129,6 @@ def new():
 
 
 if __name__ == "__main__":
-    app.debug = False
+    app.debug = True
     app.secret_key = "JQOLZVYRILIJPQYFIQVONZAFW"
     app.run()
