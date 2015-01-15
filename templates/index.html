@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block body %}
+
+<form class="form-horizontal" action="new" method="post">
+    <legend>New Paste</legend>
+        <fieldset>
+            <div class="form-group">
+                <input type="text" class="form-control" id="title" name="title" placeholder="Title (Optional)">
+            </div>
+            <div class="form-group">
+                <textarea class="form-control" rows="25" id="text" name="text"></textarea>
+            </div>
+            <div class="form-group">
+                <div class="col-md-1 col-md-offset-11">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+    </fieldset>
+</form>
+
+{% endblock %}
