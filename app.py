@@ -4,19 +4,22 @@ from datetime import datetime
 import os
 import string
 import random
+import re
 
 from dateutil.relativedelta import relativedelta
 from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
+from jinja2 import evalcontextfilter, Markup, escape
 from wtforms import Form, StringField, TextAreaField, validators
 
-basedir = os.path.abspath(os.path.dirname(__file__))
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+DATETIME_NEVER = datetime(year=1970, month=1, day=1)
+DB_FILENAME = "paste.db"
+_paragraph_re = re.compile(r"(?:\r\n|\r|\n){2,}")
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "paste.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(BASE_DIR, DB_FILENAME)
 db = SQLAlchemy(app)
-
-DATETIME_NEVER = datetime(year=1970, month=1, day=1)
 
 
 class Paste(db.Model):
@@ -55,6 +58,16 @@ def format_time(time):
     return time.strftime("%H:%M:%S %Y-%m-%d")
 
 
+@app.template_filter()
+@evalcontextfilter
+def nl2br(eval_ctx, value):
+    # http://stackoverflow.com/a/21167889/446875
+    result = u"\n\n".join(u"%s<br />" % p.replace("\n", "<br>\n") for p in _paragraph_re.split(escape(value)))
+    if eval_ctx.autoescape:
+        result = Markup(result)
+    return result
+
+
 @app.route("/", methods=["GET"])
 def main():
     return render_template("index.html", show_new_button=False)
@@ -82,7 +95,7 @@ def paste(paste_id=None):
         elif expires != DATETIME_NEVER:
             expires = "Expires: %s" % format_time(expires)
         else:
-            expires = ""
+            expires = "Expires: Never"
 
         date = "Created: %s" % format_time(this_paste.paste_date)
         title = this_paste.paste_title
