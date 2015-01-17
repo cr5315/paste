@@ -11,7 +11,19 @@
                 <textarea class="form-control" rows="25" id="text" name="text"></textarea>
             </div>
             <div class="form-group">
-                <div class="col-md-3 col-md-offset-8">
+                <div class="col-md-3 col-md-offset-5">
+                    <div class="row">
+                        <label for="language" class="col-md-4 control-label">Language</label>
+                        <div class="col-md-8">
+                            <select class="form-control" id="language" name="language">
+                                {% for language in languages %}
+                                    <option>{{language}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
                     <div class="row">
                         <label for="expires" class="col-md-4 control-label">Expires</label>
                         <div class="col-md-8">

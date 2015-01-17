@@ -1,0 +1,22 @@
+body {
+    padding-top: 60px;
+}
+
+@media (max-width: 768px) {
+    .navbar-text {
+        padding-left: 15px;
+    }
+}
+
+code {
+    background: none;
+}
+
+pre {
+    background: none;
+    border-style: none;
+}
+
+.paste {
+    white-space: pre;
+}

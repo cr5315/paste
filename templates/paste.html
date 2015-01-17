@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block body %}
 <div class="well">
-    <p>{{text | nl2br}}</p>
+    <pre><code class="{{clazz}}">{{text}}</code></pre>
 </div>
             
 {% endblock %}
