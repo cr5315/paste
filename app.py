@@ -22,9 +22,12 @@ app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(BASE_DIR, DB_FILENAME)
 db = SQLAlchemy(app)
 
-with open("languages.txt", "r") as f:
-    for line in f:
-        LANGUAGES.append(line)
+try:
+    with open("languages.txt", "r") as f:
+        for line in f:
+            LANGUAGES.append(line)
+except IOError:
+    LANGUAGES = ["None"]
 
 
 class Paste(db.Model):
