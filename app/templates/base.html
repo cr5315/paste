@@ -15,7 +15,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="{{ url_for('main') }}">cr5315 Paste</a>
+                    <a class="navbar-brand" href="{{ url_for('main') }}">Paste</a>
                 </div>
                 
                 <div class="navbar-collapse collapse navbar-responsive-collapse">
@@ -30,11 +30,12 @@
                         {% endif %}
                     </ul>
 
-                    {% if show_new_button %}
                     <ul class="nav navbar-nav navbar-right">
+                        {% if show_new_button %}
                         <li><a href="{{ url_for('main') }}">New Paste</a></li>
+                        {% endif %}
+                        <li><a href="{{ url_for('list_pastes') }}">All Pastes</a></li>
                     </ul>
-                    {% endif %}
                 </div>
             </div>
             
@@ -54,5 +55,6 @@
     <script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
+    {% block scripts %}{% endblock %}
     </body>
 </html>
