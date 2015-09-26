@@ -4,3 +4,4 @@ env/
 *.pyc
 activate.bat
 deactivate.bat
+wsgi.py
