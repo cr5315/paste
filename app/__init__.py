@@ -1,9 +1,10 @@
-from datetime import datetime
+import json
 import os
 import string
 import random
 import re
 
+from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
@@ -25,9 +26,8 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(BASE_DIR, DB
 db = SQLAlchemy(app)
 
 try:
-    with open("languages.txt", "r") as f:
-        for line in f:
-            LANGUAGES.append(line)
+    with open("app/static/languages.json", "r") as f:
+        LANGUAGES = json.load(f)
 except IOError:
     LANGUAGES = ["None"]
 
@@ -160,6 +160,5 @@ def new():
 
 
 if __name__ == "__main__":
-    app.debug = True
     app.secret_key = "JQOLZVYRILIJPQYFIQVONZAFW"
-    app.run()
+    app.run(debug=False)
