@@ -26,7 +26,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(BASE_DIR, DB
 db = SQLAlchemy(app)
 
 try:
-    with open("app/static/languages.json", "r") as f:
+    with open(os.path.join(BASE_DIR, "static", "languages.json"), "r") as f:
         LANGUAGES = json.load(f)
 except IOError:
     LANGUAGES = ["None"]
