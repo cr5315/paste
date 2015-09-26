@@ -1,5 +1,3 @@
-__author__ = "cr5315"
-
 from datetime import datetime
 import os
 import string
@@ -11,6 +9,10 @@ from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 from jinja2 import evalcontextfilter, Markup, escape
 from wtforms import Form, StringField, TextAreaField, validators
+
+
+__author__ = "cr5315"
+
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 DATETIME_NEVER = datetime(year=1970, month=1, day=1)
@@ -63,7 +65,7 @@ class PasteForm(Form):
 
 
 def get_id(length=5):
-    return "".join(random.choice(string.ascii_uppercase) for i in range(length))
+    return "".join(random.choice(string.ascii_uppercase) for _ in range(length))
 
 
 def format_time(time):

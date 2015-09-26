@@ -1,3 +1,6 @@
 .idea/
+env/
 *.db
 *.pyc
+activate.bat
+deactivate.bat
